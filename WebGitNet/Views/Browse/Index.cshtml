@@ -29,5 +29,8 @@
 </table>
 
 <p>
-  @Html.ActionLink("Create a new repo.", "Create", "Manage")
+    @if (bool.Parse(System.Web.Configuration.WebConfigurationManager.AppSettings["AllowCreateRepo"]))
+    {
+        @Html.ActionLink("Create a new repo.", "Create", "Manage")
+    }
 </p>

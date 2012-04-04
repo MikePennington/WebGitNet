@@ -12,6 +12,7 @@ namespace WebGitNet.Controllers
     using System.Web.Mvc;
     using WebGitNet.Models;
     using io = System.IO;
+    using System.Web.Configuration;
 
     public class ManageController : SharedControllerBase
     {
@@ -27,6 +28,9 @@ namespace WebGitNet.Controllers
         [HttpPost]
         public ActionResult Create(CreateRepoRequest request)
         {
+            if (bool.Parse(WebConfigurationManager.AppSettings["AllowCreateRepo"]))
+                return View();
+
             var invalid = Path.GetInvalidFileNameChars();
             if (request.RepoName.Any(c => invalid.Contains(c)))
             {

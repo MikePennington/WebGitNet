@@ -17,7 +17,10 @@
         <div id="menucontainer">
             <ul id="menu">
                 <li>@Html.ActionLink("Browse", "Index", "Browse")</li>
-                <li>@Html.ActionLink("Create Repo", "Create", "Manage")</li>
+                @if (bool.Parse(System.Web.Configuration.WebConfigurationManager.AppSettings["AllowCreateRepo"]))
+                {
+                    <li>@Html.ActionLink("Create Repo", "Create", "Manage")</li>
+                }
             </ul>
         </div>
         @if (ViewBag.BreadCrumbs != null)
