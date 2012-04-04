@@ -12,6 +12,7 @@ namespace WebGitNet.Controllers
     using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using System.Web.Configuration;
     using System.Web.Mvc;
     using System.Web.Routing;
     using WebGitNet.ActionResults;
@@ -50,6 +51,7 @@ namespace WebGitNet.Controllers
             ViewBag.LastCommit = lastCommit;
             ViewBag.CurrentTree = lastCommit != null ? GitUtilities.GetTreeInfo(resourceInfo.FullPath, "HEAD") : null;
             ViewBag.Refs = GitUtilities.GetAllRefs(resourceInfo.FullPath);
+            ViewBag.CloneUri = Path.Combine(WebConfigurationManager.AppSettings["GitUriRoot"], repo);
 
             return View();
         }
