@@ -36,6 +36,7 @@ else
 {
 <text>Last Commit:
 @Html.Partial("LogEntry", lastCommit)
+
 @foreach (var route in Html.FindSatisfiableRoutes(new { repo = repoName }))
 {
     <text>@Html.RouteLink(route.GetName(), route.GetName(), new { repo = repoName }) </text>

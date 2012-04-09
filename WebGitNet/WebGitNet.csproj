@@ -120,6 +120,8 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="browse.cshtml" />
+    <Content Include="Plugins\WebGitNet.RepoImpact.dll" />
+    <Content Include="Plugins\WebGitNet.RepoImpact.pdb" />
     <Content Include="Scripts\g.raphael\g.bar-min.js" />
     <Content Include="Scripts\g.raphael\g.dot-min.js" />
     <Content Include="Scripts\g.raphael\g.line-min.js" />
@@ -225,12 +227,15 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Plugins\" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\WebGitNet.RepoImpact\WebGitNet.RepoImpact.csproj">
+      <Project>{136DB9D1-DC65-4EFF-821C-CCB993BD3CB3}</Project>
+      <Name>WebGitNet.RepoImpact</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WebGitNet.SharedLib\WebGitNet.SharedLib.csproj">
       <Project>{F00879C2-B2F3-4202-B1BF-12A875AF4F7B}</Project>
       <Name>WebGitNet.SharedLib</Name>
