@@ -16,7 +16,7 @@ namespace WebGitNet.Controllers
 
     public class ImpactController : SharedControllerBase
     {
-        public ActionResult ViewRepoImpact(string repo)
+        public ActionResult ViewRepoImpact(string repo, string branch, string since, string before)
         {
             var resourceInfo = this.FileManager.GetResourceInfo(repo);
             if (resourceInfo.Type != ResourceType.Directory)
@@ -25,10 +25,10 @@ namespace WebGitNet.Controllers
             }
 
             this.BreadCrumbs.Append("Browse", "Index", "Browse");
-            AddRepoBreadCrumb(repo);
+            AddRepoBreadCrumb(repo, branch);
             this.BreadCrumbs.Append("Impact", "ViewRepoImpact", "Impact", new { repo });
 
-            var userImpacts = GitUtilities.GetUserImpacts(resourceInfo.FullPath);
+            var userImpacts = GitUtilities.GetUserImpacts(resourceInfo.FullPath, branch, since, before);
 
             var allTimeImpacts = (from g in userImpacts.GroupBy(u => u.Author, StringComparer.InvariantCultureIgnoreCase)
                                   select new UserImpact
@@ -60,6 +60,7 @@ namespace WebGitNet.Controllers
 
             ViewBag.AllTime = allTimeImpacts;
             ViewBag.Weekly = weeklyImpacts;
+            ViewBag.Branch = branch;
             return View();
         }
 
@@ -69,7 +70,7 @@ namespace WebGitNet.Controllers
             {
                 routes.MapRoute(
                     "View Repo Impact",
-                    "browse/{repo}/impact",
+                    "browse/{repo}/impact/{branch}",
                     new { controller = "Impact", action = "ViewRepoImpact", routeName = "View Repo Impact" });
 
                 routes.MapResource("Scripts/repo-impact.js", "text/javascript");

@@ -174,6 +174,7 @@ namespace WebGitNet
             return new RepoInfo
             {
                 Name = repoName,
+                DisplayName = repoName.Replace(".git", ""),
                 IsGitRepo = isRepo,
                 Description = description,
             };
@@ -397,13 +398,19 @@ namespace WebGitNet
             return languages;
         }
 
-        public static List<UserImpact> GetUserImpacts(string repoPath)
+        public static List<UserImpact> GetUserImpacts(string repoPath, string branch, string since = null, string before = null)
         {
             var renames = LoadRenames(repoPath);
             var ignores = LoadIgnores(repoPath);
 
+            var command = string.Format("log -z --format=%x01%H%x1e%ai%x1e%ae%x1e%an%x02 --numstat {0}", branch);
+            if (since != null)
+                command += " --since=" + since;
+            if (before != null)
+                command += " --before=" + before;
+
             string impactData;
-            using (var git = Start("log -z --format=%x01%H%x1e%ai%x1e%ae%x1e%an%x02 --numstat", repoPath, outputEncoding: Encoding.UTF8))
+            using (var git = Start(command, repoPath, outputEncoding: Encoding.UTF8))
             {
                 impactData = git.StandardOutput.ReadToEnd();
             }
@@ -562,7 +569,7 @@ namespace WebGitNet
                 throw new ArgumentNullException("tree");
             }
 
-            if (!Regex.IsMatch(tree, "^[-.a-zA-Z0-9]+$"))
+            if (!Regex.IsMatch(tree, "^[-.a-zA-Z0-9_]+$"))
             {
                 throw new ArgumentOutOfRangeException("tree", "tree mush be the id of a tree-ish object.");
             }

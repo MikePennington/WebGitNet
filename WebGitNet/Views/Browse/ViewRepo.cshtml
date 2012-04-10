@@ -34,13 +34,22 @@
 }
 else
 {
-<text>Last Commit:
-@Html.Partial("LogEntry", lastCommit)
+    <text>Last Commit:
+    @Html.Partial("LogEntry", lastCommit)
 
-@foreach (var route in Html.FindSatisfiableRoutes(new { repo = repoName }))
-{
-    <text>@Html.RouteLink(route.GetName(), route.GetName(), new { repo = repoName }) </text>
-}</text>
+    @{
+        bool first = true;
+        foreach (var route in Html.FindSatisfiableRoutes(new { repo = repoName }))
+        {
+            if (!first)
+            {
+                    <span> | </span>
+            }
+                <text>@Html.RouteLink(route.GetName(), route.GetName(), new { repo = repoName, branch = ViewBag.Branch })</text>
+            first = false;
+        }
+    }
+    </text>
 }
 </div>
 
@@ -51,7 +60,17 @@ else
   <ul id="ref-list">
   @foreach (var r in refs.Where(r => r.RefType != RefType.RemoteBranch).OrderBy(r => r.Name))
   {
-    <li><span class="git-icon @(r.RefType == RefType.Tag ? "git-icon-tag" : "git-icon-branch")"></span> @r.Name</li>
+    <li>
+        <span class="git-icon @(r.RefType == RefType.Tag ? "git-icon-tag" : "git-icon-branch")"></span>
+        @if (r.Name == ViewBag.Branch)
+        {
+            <span class="current-banch">@r.Name</span>
+        }
+        else
+        {
+            @Html.RouteLink(r.Name, "View Repo", new { branch = r.Name })
+        }
+    </li>
   }
   </ul>
 </div>
@@ -64,6 +83,6 @@ else
 }
 else
 {
-@Html.Partial("ObjectTree", currentTree)
+    @Html.Partial("ObjectTree", currentTree)
 }
 </div>

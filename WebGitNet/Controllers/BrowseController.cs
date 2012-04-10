@@ -35,7 +35,7 @@ namespace WebGitNet.Controllers
             return View(repos);
         }
 
-        public ActionResult ViewRepo(string repo)
+        public ActionResult ViewRepo(string repo, string branch)
         {
             var resourceInfo = this.FileManager.GetResourceInfo(repo);
             if (resourceInfo.Type != ResourceType.Directory)
@@ -43,15 +43,16 @@ namespace WebGitNet.Controllers
                 return HttpNotFound();
             }
 
-            AddRepoBreadCrumb(repo);
+            AddRepoBreadCrumb(repo, branch);
 
-            var lastCommit = GitUtilities.GetLogEntries(resourceInfo.FullPath, 1).FirstOrDefault();
+            var lastCommit = GitUtilities.GetLogEntries(resourceInfo.FullPath, 1, 0, branch).FirstOrDefault();
 
             ViewBag.RepoName = resourceInfo.Name;
             ViewBag.LastCommit = lastCommit;
-            ViewBag.CurrentTree = lastCommit != null ? GitUtilities.GetTreeInfo(resourceInfo.FullPath, "HEAD") : null;
+            ViewBag.CurrentTree = lastCommit != null ? GitUtilities.GetTreeInfo(resourceInfo.FullPath, branch) : null;
             ViewBag.Refs = GitUtilities.GetAllRefs(resourceInfo.FullPath);
-            ViewBag.CloneUri = Path.Combine(WebConfigurationManager.AppSettings["GitUriRoot"], repo);
+            ViewBag.CloneUri = Path.Combine(WebConfigurationManager.AppSettings["GitUriRoot"]);
+            ViewBag.Branch = branch;
 
             return View();
         }
@@ -64,7 +65,6 @@ namespace WebGitNet.Controllers
                 return HttpNotFound();
             }
 
-            AddRepoBreadCrumb(repo);
             this.BreadCrumbs.Append("Browse", "ViewCommit", @object, new { repo, @object });
 
             var commit = GitUtilities.GetLogEntries(resourceInfo.FullPath, 1, 0, @object).FirstOrDefault();
@@ -81,7 +81,7 @@ namespace WebGitNet.Controllers
             return View(diffs);
         }
 
-        public ActionResult ViewCommits(string repo, int page = 1)
+        public ActionResult ViewCommits(string repo, string branch, int page = 1)
         {
             var resourceInfo = this.FileManager.GetResourceInfo(repo);
             if (resourceInfo.Type != ResourceType.Directory || page < 1)
@@ -98,10 +98,10 @@ namespace WebGitNet.Controllers
                 return HttpNotFound();
             }
 
-            AddRepoBreadCrumb(repo);
+            AddRepoBreadCrumb(repo, branch);
             this.BreadCrumbs.Append("Browse", "ViewCommits", "Commit Log", new { repo });
 
-            var commits = GitUtilities.GetLogEntries(resourceInfo.FullPath, PageSize, skip);
+            var commits = GitUtilities.GetLogEntries(resourceInfo.FullPath, PageSize, skip, branch);
 
             ViewBag.Page = page;
             ViewBag.PageCount = (count / PageSize) + (count % PageSize > 0 ? 1 : 0);
@@ -128,7 +128,6 @@ namespace WebGitNet.Controllers
                 return HttpNotFound();
             }
 
-            AddRepoBreadCrumb(repo);
             this.BreadCrumbs.Append("Browse", "ViewTree", @object, new { repo, @object, path = string.Empty });
             this.BreadCrumbs.Append("Browse", "ViewTree", BreadCrumbTrail.EnumeratePath(path), p => p.Key, p => new { repo, @object, path = p.Value });
 
@@ -172,7 +171,6 @@ namespace WebGitNet.Controllers
                 return new GitFileResult(resourceInfo.FullPath, @object, path, contentType);
             }
 
-            AddRepoBreadCrumb(repo);
             this.BreadCrumbs.Append("Browse", "ViewTree", @object, new { repo, @object, path = string.Empty });
             var paths = BreadCrumbTrail.EnumeratePath(path, TrailingSlashBehavior.LeaveOffLastTrailingSlash).ToList();
             this.BreadCrumbs.Append("Browse", "ViewTree", paths.Take(paths.Count() - 1), p => p.Key, p => new { repo, @object, path = p.Value });
@@ -210,7 +208,7 @@ namespace WebGitNet.Controllers
 
                 routes.MapRoute(
                     "View Repo",
-                    "browse/{repo}",
+                    "browse/{repo}/{branch}",
                     new { controller = "Browse", action = "ViewRepo" });
 
                 routes.MapRoute(
@@ -230,7 +228,7 @@ namespace WebGitNet.Controllers
 
                 routes.MapRoute(
                     "View Commit Log",
-                    "browse/{repo}/commits",
+                    "browse/{repo}/commits/{branch}",
                     new { controller = "Browse", action = "ViewCommits", routeName = "View Commit Log" });
             }
         }
