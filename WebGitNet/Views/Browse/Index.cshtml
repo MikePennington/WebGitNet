@@ -19,7 +19,7 @@
 {
     if (repo.IsGitRepo)
     {
-  <tr><td>@Html.ActionLink(repo.DisplayName, "ViewRepo", new { repo = repo.Name, branch = "master" })</td><td>@repo.Description</td></tr>
+  <tr><td>@Html.ActionLink(repo.DisplayName, "ViewRepo", new { repo = repo.Name, branch = ViewBag.DefaultBranch })</td><td>@repo.Description</td></tr>
     }
     else
     {
@@ -29,7 +29,7 @@
 </table>
 
 <p>
-    @if (bool.Parse(System.Web.Configuration.WebConfigurationManager.AppSettings["AllowCreateRepo"]))
+    @if (ViewBag.AllowCreateRepo)
     {
         @Html.ActionLink("Create a new repo.", "Create", "Manage")
     }

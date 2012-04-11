@@ -32,6 +32,9 @@ namespace WebGitNet.Controllers
             var repos = (from dir in directory.EnumerateDirectories()
                          select GitUtilities.GetRepoInfo(dir.FullName)).ToList();
 
+            ViewBag.AllowCreateRepo = bool.Parse(WebConfigurationManager.AppSettings["AllowCreateRepo"]);
+            ViewBag.DefaultBranch = WebConfigurationManager.AppSettings["DefaultBranch"];
+
             return View(repos);
         }
 
