@@ -37,13 +37,15 @@ namespace WebGitNet.Controllers
 
         public ActionResult ViewRepo(string repo, string branch)
         {
+            var repoInfo = new RepoInfo(repo, branch);
+            
             var resourceInfo = this.FileManager.GetResourceInfo(repo);
             if (resourceInfo.Type != ResourceType.Directory)
             {
                 return HttpNotFound();
             }
 
-            AddRepoBreadCrumb(repo, branch);
+            AddRepoBreadCrumb(repoInfo);
 
             var lastCommit = GitUtilities.GetLogEntries(resourceInfo.FullPath, 1, 0, branch).FirstOrDefault();
 
@@ -51,8 +53,16 @@ namespace WebGitNet.Controllers
             ViewBag.LastCommit = lastCommit;
             ViewBag.CurrentTree = lastCommit != null ? GitUtilities.GetTreeInfo(resourceInfo.FullPath, branch) : null;
             ViewBag.Refs = GitUtilities.GetAllRefs(resourceInfo.FullPath);
-            ViewBag.CloneUri = Path.Combine(WebConfigurationManager.AppSettings["GitUriRoot"]);
             ViewBag.Branch = branch;
+
+            string cloneUri = Path.Combine(WebConfigurationManager.AppSettings["GitUriRoot"], repoInfo.DisplayName);
+            if (!string.IsNullOrWhiteSpace(User.Identity.Name))
+            {
+                var username = User.Identity.Name;
+                username = username.IndexOf('\\') > 0 ? username.Substring(username.IndexOf('\\') + 1) : username;
+                cloneUri = cloneUri.Replace("[username]", username);
+            }
+            ViewBag.CloneUri = cloneUri;
 
             return View();
         }
@@ -98,7 +108,8 @@ namespace WebGitNet.Controllers
                 return HttpNotFound();
             }
 
-            AddRepoBreadCrumb(repo, branch);
+            var repoInfo = new RepoInfo(repo, branch);
+            AddRepoBreadCrumb(repoInfo);
             this.BreadCrumbs.Append("Browse", "ViewCommits", "Commit Log", new { repo });
 
             var commits = GitUtilities.GetLogEntries(resourceInfo.FullPath, PageSize, skip, branch);

@@ -25,11 +25,10 @@ namespace WebGitNet
             ViewBag.BreadCrumbs = this.breadCrumbs;
         }
 
-        protected void AddRepoBreadCrumb(string repo, string branch)
+        protected void AddRepoBreadCrumb(RepoInfo repoInfo)
         {
-            string displayName = repo.Replace(".git", "");
-            this.BreadCrumbs.Append("Browse", "ViewRepo", displayName, new { repo });
-            this.BreadCrumbs.Append("Browse", "ViewRepo", branch, new { branch });
+            this.BreadCrumbs.Append("Browse", "ViewRepo", repoInfo.DisplayName, new { repoInfo.Name });
+            this.BreadCrumbs.Append("Browse", "ViewRepo", repoInfo.Branch, new { repoInfo.Branch });
         }
 
         public FileManager FileManager

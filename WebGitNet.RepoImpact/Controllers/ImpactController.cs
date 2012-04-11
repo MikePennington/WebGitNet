@@ -24,8 +24,9 @@ namespace WebGitNet.Controllers
                 return HttpNotFound();
             }
 
+            var repoInfo = new RepoInfo(repo, branch);
             this.BreadCrumbs.Append("Browse", "Index", "Browse");
-            AddRepoBreadCrumb(repo, branch);
+            AddRepoBreadCrumb(repoInfo);
             this.BreadCrumbs.Append("Impact", "ViewRepoImpact", "Impact", new { repo });
 
             var userImpacts = GitUtilities.GetUserImpacts(resourceInfo.FullPath, branch, since, before);

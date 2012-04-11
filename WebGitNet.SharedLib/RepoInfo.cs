@@ -7,19 +7,18 @@
 
     public class RepoInfo
     {
+        public RepoInfo(string name, string branch)
+        {
+            Name = name;
+            DisplayName = name.Replace(".git", "");
+            Branch = branch;
+        }
+
         public string Name { get; set; }
 
-        private string _displayName;
-        public string DisplayName {
-            get
-            {
-                return _displayName == null ? Name : _displayName;
-            }
-            set
-            {
-                _displayName = value;
-            }
-        }
+        public string DisplayName { get; set; }
+        
+        public string Branch { get; set; }
 
         public string Description { get; set; }
 

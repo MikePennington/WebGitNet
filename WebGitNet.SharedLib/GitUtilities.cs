@@ -171,10 +171,8 @@ namespace WebGitNet
                      File.Exists(Path.Combine(repoPath, "HEAD")))
                 );
 
-            return new RepoInfo
+            return new RepoInfo(repoName, null)
             {
-                Name = repoName,
-                DisplayName = repoName.Replace(".git", ""),
                 IsGitRepo = isRepo,
                 Description = description,
             };
