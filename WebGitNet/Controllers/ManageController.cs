@@ -28,7 +28,7 @@ namespace WebGitNet.Controllers
         [HttpPost]
         public ActionResult Create(CreateRepoRequest request)
         {
-            if (bool.Parse(WebConfigurationManager.AppSettings["AllowCreateRepo"]))
+            if (!bool.Parse(WebConfigurationManager.AppSettings["AllowCreateRepo"]))
                 return View();
 
             var invalid = Path.GetInvalidFileNameChars();
