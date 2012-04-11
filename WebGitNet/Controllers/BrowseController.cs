@@ -40,6 +40,7 @@ namespace WebGitNet.Controllers
 
         public ActionResult ViewRepo(string repo, string branch)
         {
+            branch = branch == null ? WebConfigurationManager.AppSettings["DefaultBranch"] : branch;
             var repoInfo = new RepoInfo(repo, branch);
             
             var resourceInfo = this.FileManager.GetResourceInfo(repo);

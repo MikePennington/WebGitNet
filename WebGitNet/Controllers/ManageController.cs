@@ -37,6 +37,9 @@ namespace WebGitNet.Controllers
                 ModelState.AddModelError("RepoName", "Repository name must be a valid folder name.");
             }
 
+            if (!request.RepoName.EndsWith(".git"))
+                request.RepoName += ".git";
+
             var resourceInfo = this.FileManager.GetResourceInfo(request.RepoName);
             if (resourceInfo.FileSystemInfo == null)
             {
@@ -69,7 +72,23 @@ namespace WebGitNet.Controllers
 
             GitUtilities.ExecutePostCreateHook(repoPath);
 
-            return RedirectToAction("ViewRepo", "Browse", new { repo = request.RepoName });
+            // Execute .bat file if one is setup
+            string repositoriesPath = WebConfigurationManager.AppSettings["RepositoriesPath"];
+            string postCreateBatPath = Path.Combine(repositoriesPath, WebConfigurationManager.AppSettings["PostCreateBatFile"]);
+            if (System.IO.File.Exists(postCreateBatPath))
+            {
+                var proc = new System.Diagnostics.Process();
+                proc.StartInfo.FileName = postCreateBatPath;
+                proc.StartInfo.Arguments = request.RepoName;
+                proc.StartInfo.RedirectStandardError = false;
+                proc.StartInfo.RedirectStandardOutput = false;
+                proc.StartInfo.UseShellExecute = false;
+                proc.StartInfo.WorkingDirectory = repositoriesPath;
+                proc.Start();
+                proc.WaitForExit();
+            }
+
+            return RedirectToAction("ViewRepo", "Browse", new { repo = request.RepoName, branch = WebConfigurationManager.AppSettings["DefaultBranch"] });
         }
     }
 }
