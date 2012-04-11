@@ -6,6 +6,7 @@
 *.docstates
 Thumbs.db
 *.Publish.xml
+_ReSharper.*
 
 /WebGitNet/Plugins/
 /WebGitNet/Views/PluginCache/

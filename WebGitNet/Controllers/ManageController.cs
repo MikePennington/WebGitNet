@@ -73,17 +73,15 @@ namespace WebGitNet.Controllers
             GitUtilities.ExecutePostCreateHook(repoPath);
 
             // Execute .bat file if one is setup
-            string repositoriesPath = WebConfigurationManager.AppSettings["RepositoriesPath"];
-            string postCreateBatPath = Path.Combine(repositoriesPath, WebConfigurationManager.AppSettings["PostCreateBatFile"]);
+            string postCreateBatPath = WebConfigurationManager.AppSettings["PostCreateBatFilePath"];
             if (System.IO.File.Exists(postCreateBatPath))
             {
                 var proc = new System.Diagnostics.Process();
                 proc.StartInfo.FileName = postCreateBatPath;
-                proc.StartInfo.Arguments = request.RepoName;
+                proc.StartInfo.Arguments = repoPath;
                 proc.StartInfo.RedirectStandardError = false;
                 proc.StartInfo.RedirectStandardOutput = false;
                 proc.StartInfo.UseShellExecute = false;
-                proc.StartInfo.WorkingDirectory = repositoriesPath;
                 proc.Start();
                 proc.WaitForExit();
             }
