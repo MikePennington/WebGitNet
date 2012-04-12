@@ -14,10 +14,9 @@ namespace WebGitNet
     using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
-    using System.Threading;
-    using System.Web.Configuration;
-    using MvcMiniProfiler;
     using System.Threading.Tasks;
+    using System.Web.Configuration;
+    using StackExchange.Profiling;
 
     public static class GitUtilities
     {
@@ -221,16 +220,24 @@ namespace WebGitNet
             return RefValidationResult.Valid;
         }
 
-        public static int CountCommits(string repoPath, string @object = null)
+        public static int CountCommits(string repoPath, string @object = null, bool allRefs = false)
         {
             @object = @object ?? "HEAD";
-            var results = Execute(string.Format("shortlog -s {0}", Q(@object)), repoPath);
+            var results = Execute(string.Format("shortlog -s{0} {1}", allRefs ? " --all" : "", Q(@object)), repoPath);
             return (from r in results.Split("\n".ToArray(), StringSplitOptions.RemoveEmptyEntries)
                     let count = r.Split("\t".ToArray(), StringSplitOptions.RemoveEmptyEntries)[0]
                     select int.Parse(count.Trim())).Sum();
         }
 
-        public static List<LogEntry> GetLogEntries(string repoPath, int count, int skip = 0, string @object = null)
+        public static string[] GetFilePaths(string repoPath, string @object = null, string filter = null)
+        {
+            @object = @object ?? "HEAD";
+            var results = Execute(string.Format("git ls-tree -r -z --full-name --name-only {0}", Q(@object)), repoPath);
+
+            return results.Split('\0');
+        }
+
+        public static List<LogEntry> GetLogEntries(string repoPath, int count, int skip = 0, string @object = null, bool allRefs = false)
         {
             if (count < 0)
             {
@@ -243,7 +250,7 @@ namespace WebGitNet
             }
 
             @object = @object ?? "HEAD";
-            var results = Execute(string.Format("log -n {0} --encoding=UTF-8 -z --format=\"format:commit %H%ntree %T%nparent %P%nauthor %an%nauthor mail %ae%nauthor date %aD%ncommitter %cn%ncommitter mail %ce%ncommitter date %cD%nsubject %s%n%b%x00\" {1}", count + skip, Q(@object)), repoPath, Encoding.UTF8);
+            var results = Execute(string.Format("log -n {0} --encoding=UTF-8 -z --date-order --format=\"format:commit %H%ntree %T%nparent %P%nauthor %an%nauthor mail %ae%nauthor date %aD%ncommitter %cn%ncommitter mail %ce%ncommitter date %cD%nsubject %s%n%b%x00\"{1} {2}", count + skip, allRefs ? " --all" : "", Q(@object)), repoPath, Encoding.UTF8);
 
             Func<string, LogEntry> parseResults = result =>
             {

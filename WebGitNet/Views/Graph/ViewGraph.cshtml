@@ -1,0 +1,34 @@
+﻿@model IEnumerable<GraphEntry>
+@{
+    ViewBag.Title = "Repository Graph";
+}
+
+@section headers
+{
+    <link href="@Url.Content("~/Content/graph.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/graph.js")"></script>
+}
+
+<div class="pager">
+    @Html.Pager((int)ViewBag.Page, (int)ViewBag.PageCount, "Graph", "ViewGraph", new { repo = ViewBag.RepoName })
+</div>
+
+<div class="graph">
+    <canvas id="graph-canvas" width="0" height="0">
+    </canvas>
+@foreach (var e in Model)
+{
+    <div class="graph-node" data-node="@e.Node" data-parent-nodes="@string.Join(",", e.ParentNodes)" data-incoming-nodes="@string.Join(",", e.IncomingNodes)">
+        @foreach (var r in e.Refs)
+        {
+            <span class="git-ref @("git-ref-" + r.RefType.ToString().ToLower())">@r.Name</span>
+        }
+
+        @Html.ActionLink(string.IsNullOrWhiteSpace(e.LogEntry.Subject) ? "(no subject)" : e.LogEntry.Subject, "ViewCommit", "Browse", new { @object = e.LogEntry.CommitHash }, null)
+    </div>
+}
+</div>
+
+<div class="pager">
+    @Html.Pager((int)ViewBag.Page, (int)ViewBag.PageCount, "Graph", "ViewGraph", new { repo = ViewBag.RepoName })
+</div>

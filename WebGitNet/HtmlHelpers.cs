@@ -36,12 +36,12 @@ namespace WebGitNet
             }
 
             var imgUrl = string.Format(
-                "http://www.gravatar.com/avatar/{0}.png?s={1}&d={2}&r=g",
+                "https://secure.gravatar.com/avatar/{0}.png?s={1}&d={2}&r=g",
                 HashString(email),
                 size,
                 fallBack);
 
-            return new MvcHtmlString("<img alt=\"" + html.AttributeEncode(name) + "\" src=\"" + html.AttributeEncode(imgUrl) + "\" />");
+            return new MvcHtmlString("<img alt=\"\" title=\"" + html.AttributeEncode(name) + "\" src=\"" + html.AttributeEncode(imgUrl) + "\" />");
         }
 
         public static IEnumerable<Route> FindSatisfiableRoutes(this HtmlHelper html, object routeData = null)
@@ -51,21 +51,14 @@ namespace WebGitNet
             var request = html.ViewContext.RequestContext;
             var routeValues = routeData == null ? html.ViewContext.RouteData.Values : new RouteValueDictionary(routeData);
 
-            foreach (var route in routes.OfType<Route>())
-            {
-                if (route == current || route.GetName() == null)
-                {
-                    continue;
-                }
-
-                var routed = route.GetVirtualPath(request, routeValues);
-                if (routed != null)
-                {
-                    yield return route;
-                }
-            }
-
-            yield break;
+            return from route in routes.OfType<Route>()
+                   where route != current
+                   let name = route.GetName()
+                   where name != null
+                   let routed = route.GetVirtualPath(request, routeValues)
+                   where routed != null
+                   orderby name
+                   select route;
         }
 
         public static string GetName(this Route route)
