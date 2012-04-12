@@ -27,7 +27,7 @@ namespace WebGitNet.Controllers
                 return HttpNotFound();
             }
 
-            int PageSize = 50;
+            int PageSize = int.Parse(WebConfigurationManager.AppSettings["ViewGraphPageSize"]);
             int skip = PageSize * (page - 1);
             var count = GitUtilities.CountCommits(resourceInfo.FullPath, allRefs: true);
 
