@@ -5,6 +5,8 @@
 // <author>John Gietzen</author>
 //-----------------------------------------------------------------------
 
+using System.Web.Configuration;
+
 namespace WebGitNet.Controllers
 {
     using System;
@@ -17,7 +19,7 @@ namespace WebGitNet.Controllers
 
     public class GraphController : SharedControllerBase
     {
-        public ActionResult ViewGraph(string repo, int page = 1)
+        public ActionResult ViewGraph(string repo, string branch, int page = 1)
         {
             var resourceInfo = this.FileManager.GetResourceInfo(repo);
             if (resourceInfo.Type != ResourceType.Directory || page < 1)
@@ -25,7 +27,7 @@ namespace WebGitNet.Controllers
                 return HttpNotFound();
             }
 
-            const int PageSize = 50;
+            int PageSize = 50;
             int skip = PageSize * (page - 1);
             var count = GitUtilities.CountCommits(resourceInfo.FullPath, allRefs: true);
 
@@ -35,7 +37,7 @@ namespace WebGitNet.Controllers
             }
 
             this.BreadCrumbs.Append("Browse", "Index", "Browse");
-            AddRepoBreadCrumb(repo);
+            AddRepoBreadCrumb(new RepoInfo(repo, branch));
             this.BreadCrumbs.Append("Graph", "ViewGraph", "View Graph", new { repo });
 
             var commits = GetLogEntries(resourceInfo.FullPath, skip + PageSize).Skip(skip).ToList();
@@ -173,7 +175,7 @@ namespace WebGitNet.Controllers
             {
                 routes.MapRoute(
                     "View Graph",
-                    "browse/{repo}/graph",
+                    "browse/{repo}/{branch}/graph",
                     new { controller = "Graph", action = "ViewGraph", routeName = "View Graph" });
 
                 routes.MapResource("Content/graph.css", "text/css");
