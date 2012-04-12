@@ -1,4 +1,5 @@
-﻿@{
+﻿@using System.Web.Mvc.Html
+@{
     ViewBag.Title = "Repository Impact";
     IEnumerable<dynamic> weekly = ViewBag.Weekly;
     IEnumerable<dynamic> allTime = ViewBag.AllTime;
@@ -69,11 +70,11 @@
     <table>
         <tr>
             <td><label for="since">Since:</label></td>
-            <td>@Html.TextBox("since")</td>
+            <td>@Html.TextBox("since", (string)ViewBag.Since)</td>
         </tr>
         <tr>
             <td><label for="before">Before:</label></td>
-            <td>@Html.TextBox("before")</td>
+            <td>@Html.TextBox("before", (string)ViewBag.Before)</td>
         </tr>
     </table>
     <input type="submit" value="Submit" />

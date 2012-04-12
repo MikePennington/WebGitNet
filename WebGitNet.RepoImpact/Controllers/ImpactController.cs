@@ -24,6 +24,9 @@ namespace WebGitNet.Controllers
                 return HttpNotFound();
             }
 
+            if(string.IsNullOrWhiteSpace(since))
+                since = DateTime.Now.Subtract(new TimeSpan(30, 0, 0, 0)).ToString("yyyy-MM-dd");
+
             var repoInfo = new RepoInfo(repo, branch);
             this.BreadCrumbs.Append("Browse", "Index", "Browse");
             AddRepoBreadCrumb(repoInfo);
@@ -62,6 +65,8 @@ namespace WebGitNet.Controllers
             ViewBag.AllTime = allTimeImpacts;
             ViewBag.Weekly = weeklyImpacts;
             ViewBag.Branch = branch;
+            ViewBag.Since = since;
+            ViewBag.Before = before;
             return View();
         }
 
