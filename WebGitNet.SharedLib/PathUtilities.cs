@@ -5,6 +5,10 @@
 // <author>John Gietzen</author>
 //-----------------------------------------------------------------------
 
+using System.IO;
+using System.Security.Principal;
+using System.Web.Configuration;
+
 namespace WebGitNet
 {
     using System;
@@ -110,5 +114,18 @@ namespace WebGitNet
 
             return new Regex(text.Append(@"\z").ToString(), RegexOptions.Compiled);
         }
+
+        public static string ParseCloneUrl(IPrincipal user, RepoInfo repoInfo)
+        {
+            string cloneUrl = Path.Combine(WebConfigurationManager.AppSettings["GitUriRoot"], repoInfo.DisplayName);
+            if (!string.IsNullOrWhiteSpace(user.Identity.Name))
+            {
+                var username = user.Identity.Name;
+                username = username.IndexOf('\\') > 0 ? username.Substring(username.IndexOf('\\') + 1) : username;
+                cloneUrl = cloneUrl.Replace("[username]", username);
+            }
+            return cloneUrl;
+        }
+
     }
 }

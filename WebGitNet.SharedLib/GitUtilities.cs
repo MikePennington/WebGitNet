@@ -656,7 +656,7 @@ namespace WebGitNet
         public static void CreateRepo(string repoPath)
         {
             var workingDir = Path.GetDirectoryName(repoPath);
-            var results = Execute(string.Format("init --bare {0}", Q(repoPath)), workingDir, trustErrorCode: true);
+            var results = Execute(string.Format("init --bare {0}", repoPath), workingDir, trustErrorCode: true);
         }
 
         public static void ExecutePostCreateHook(string repoPath)

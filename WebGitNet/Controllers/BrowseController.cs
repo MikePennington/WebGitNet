@@ -59,14 +59,7 @@ namespace WebGitNet.Controllers
             ViewBag.Refs = GitUtilities.GetAllRefs(resourceInfo.FullPath);
             ViewBag.Branch = branch;
 
-            string cloneUri = Path.Combine(WebConfigurationManager.AppSettings["GitUriRoot"], repoInfo.DisplayName);
-            if (!string.IsNullOrWhiteSpace(User.Identity.Name))
-            {
-                var username = User.Identity.Name;
-                username = username.IndexOf('\\') > 0 ? username.Substring(username.IndexOf('\\') + 1) : username;
-                cloneUri = cloneUri.Replace("[username]", username);
-            }
-            ViewBag.CloneUri = cloneUri;
+            ViewBag.CloneUri = PathUtilities.ParseCloneUrl(User, repoInfo);
 
             return View();
         }

@@ -78,7 +78,8 @@ namespace WebGitNet.Controllers
             {
                 var proc = new System.Diagnostics.Process();
                 proc.StartInfo.FileName = postCreateBatPath;
-                proc.StartInfo.Arguments = repoPath;
+                proc.StartInfo.WorkingDirectory = Path.GetDirectoryName(postCreateBatPath);
+                proc.StartInfo.Arguments = PathUtilities.ParseCloneUrl(User, new RepoInfo(request.RepoName, null)) + " > log.txt 2>&1";
                 proc.StartInfo.RedirectStandardError = false;
                 proc.StartInfo.RedirectStandardOutput = false;
                 proc.StartInfo.UseShellExecute = false;
