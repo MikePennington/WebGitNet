@@ -27,6 +27,29 @@
   </table>
 </div>
 
+@if (refs.Any())
+{
+<div class="page-section">
+  Branches / Tags (currently viewing <strong>@ViewBag.Branch</strong>):
+  <ul id="ref-list">
+  @foreach (var r in refs.Where(r => r.RefType != RefType.RemoteBranch).OrderBy(r => r.Name))
+  {
+    <li>
+        <span class="git-icon @(r.RefType == RefType.Tag ? "git-icon-tag" : "git-icon-branch")"></span>
+        @if (r.Name == ViewBag.Branch)
+        {
+            <span class="current-banch">@r.Name</span>
+        }
+        else
+        {
+            @Html.RouteLink(r.Name, "View Repo", new { branch = r.Name })
+        }
+    </li>
+  }
+  </ul>
+</div>
+}
+
 <div id="last-commit" class="page-section">
 @if (lastCommit == null)
 {
@@ -52,29 +75,6 @@ else
     </text>
 }
 </div>
-
-@if (refs.Any())
-{
-<div class="page-section">
-  Branches / Tags:
-  <ul id="ref-list">
-  @foreach (var r in refs.Where(r => r.RefType != RefType.RemoteBranch).OrderBy(r => r.Name))
-  {
-    <li>
-        <span class="git-icon @(r.RefType == RefType.Tag ? "git-icon-tag" : "git-icon-branch")"></span>
-        @if (r.Name == ViewBag.Branch)
-        {
-            <span class="current-banch">@r.Name</span>
-        }
-        else
-        {
-            @Html.RouteLink(r.Name, "View Repo", new { branch = r.Name })
-        }
-    </li>
-  }
-  </ul>
-</div>
-}
 
 <div class="page-section">
 @if (currentTree == null || currentTree.Objects.Count == 0)
